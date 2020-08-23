@@ -1,0 +1,9 @@
+D:\Senthil\PolicyManagementSystem\wip\PolicyManagement\Domain\bin\Debug\netstandard2.1\Domain.deps.json
+D:\Senthil\PolicyManagementSystem\wip\PolicyManagement\Domain\bin\Debug\netstandard2.1\Domain.dll
+D:\Senthil\PolicyManagementSystem\wip\PolicyManagement\Domain\bin\Debug\netstandard2.1\Domain.pdb
+D:\Senthil\PolicyManagementSystem\wip\PolicyManagement\Domain\obj\Debug\netstandard2.1\Domain.csprojAssemblyReference.cache
+D:\Senthil\PolicyManagementSystem\wip\PolicyManagement\Domain\obj\Debug\netstandard2.1\Domain.AssemblyInfoInputs.cache
+D:\Senthil\PolicyManagementSystem\wip\PolicyManagement\Domain\obj\Debug\netstandard2.1\Domain.AssemblyInfo.cs
+D:\Senthil\PolicyManagementSystem\wip\PolicyManagement\Domain\obj\Debug\netstandard2.1\Domain.csproj.CoreCompileInputs.cache
+D:\Senthil\PolicyManagementSystem\wip\PolicyManagement\Domain\obj\Debug\netstandard2.1\Domain.dll
+D:\Senthil\PolicyManagementSystem\wip\PolicyManagement\Domain\obj\Debug\netstandard2.1\Domain.pdb
