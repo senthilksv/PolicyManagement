@@ -12,7 +12,7 @@ namespace Application.Interfaces
             Policy policy);
 
         Task<Policy> DeleteByIdAsync(
-            int id);
+            Guid id);
 
         Task<Policy> FetchByParameterAsync(
             string policyNumber, ProductType productType);

@@ -43,6 +43,7 @@ namespace PolicyManagement.Api.Controllers
         {
             if (string.IsNullOrEmpty(policyNumber))
             {
+                _logger.LogInformation("Policy Number or Product type can not be blank");
                 return BadRequest("Policy Number or Product type can not be blank");
             }
 
@@ -59,6 +60,7 @@ namespace PolicyManagement.Api.Controllers
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogInformation("Add action Model state validaiton failed", ModelState);
                 return BadRequest(ModelState);
             }
 
@@ -67,26 +69,53 @@ namespace PolicyManagement.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("", Name = "UpdatePolicy")]
+        [HttpPut("{id}", Name = "UpdatePolicy")]
         [ProducesResponseType(201, Type = typeof(GetPolicyViewModel))]
-        [ProducesResponseType(400, Type = typeof(ModelStateDictionary))]
-        [ProducesResponseType(400, Type = typeof(string))]
-        public async Task<IActionResult> UpdateAsync([FromQuery] Guid id,
+        [ProducesResponseType(400, Type = typeof(ModelStateDictionary))]       
+        public async Task<IActionResult> UpdateAsync([FromRoute] Guid id,
            [FromBody] PolicyViewModel policyViewModel)
         {
             if (!ModelState.IsValid)
             {
+                _logger.LogInformation("Update action Model state validaiton failed", ModelState);
                 return BadRequest(ModelState);
+            }
+
+            if (id == null
+                || id == Guid.Empty)
+            {
+                _logger.LogInformation("Id required");
+                return BadRequest("Id required.");
             }
 
             var result = await _policyService.UpdatePolicyAsync(id, policyViewModel);
 
             if(result == null)
             {
+                _logger.LogInformation($"No Policy Found for the given Id :{id}");
                 return BadRequest("Policy not found for an update");
             }
 
             return Ok(result);
+        }
+
+        [HttpDelete("{id}", Name = "DeletePolicy")]
+        [ProducesResponseType(204)]
+        [ProducesResponseType(400)]      
+        public async Task<IActionResult> DeleteByIdAsync(
+           [FromRoute] Guid id)
+        {
+            if (id == null
+                || id == Guid.Empty)
+            {
+                _logger.LogInformation("Id required");               
+                return BadRequest("Id required.");
+            }
+
+            await _policyService.DeletePolicyAsync(
+                id);
+
+            return NoContent();
         }
     }
 }

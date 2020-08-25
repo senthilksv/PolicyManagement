@@ -4,18 +4,18 @@ using System.Text;
 
 namespace Application.Wrappers
 {
-    public class Response<T>
+    public class ApiResponse<T>
     {
-        public Response()
+        public ApiResponse()
         {
         }
-        public Response(T data, string message = null)
+        public ApiResponse(T data, string message = null)
         {
             Succeeded = true;
             Message = message;
             Data = data;
         }
-        public Response(string message)
+        public ApiResponse(string message)
         {
             Succeeded = false;
             Message = message;

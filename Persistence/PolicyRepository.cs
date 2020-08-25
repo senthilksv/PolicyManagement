@@ -7,15 +7,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
 using System.Linq;
+using Microsoft.Extensions.Logging;
 
 namespace Persistence
 {
     public class PolicyRepository : CosmosDbRepository, IPolicyRepository
     {
         private readonly Container _policyContainer;
-        public PolicyRepository(IOptions<AzureCosmosDbOptions> azureCosmosDbOptions) : base(azureCosmosDbOptions)
+        private readonly ILogger<PolicyRepository> _logger;
+
+        public PolicyRepository(IOptions<AzureCosmosDbOptions> azureCosmosDbOptions, ILogger<PolicyRepository> logger) : base(azureCosmosDbOptions)
         {
             _policyContainer = _cosmosDatabase.GetContainer("Policy");
+            _logger = logger;
         }
 
         public async Task<Policy> AddAsync(Policy policy)
@@ -24,9 +28,9 @@ namespace Persistence
             return await _policyContainer.CreateItemAsync<Policy>(policy, new PartitionKey(policy.Id.ToString()));
         }
 
-        public async Task<Policy> DeleteByIdAsync(int id)
+        public async Task<Policy> DeleteByIdAsync(Guid id)
         {
-            return await this._policyContainer.DeleteItemAsync<Policy>(id.ToString(), new PartitionKey(id));
+            return await this._policyContainer.DeleteItemAsync<Policy>(id.ToString(), new PartitionKey(id.ToString()));
         }
 
         public async Task<Policy> FetchByParameterAsync(string policyNumber, ProductType productType)
@@ -92,7 +96,16 @@ namespace Persistence
         public async Task<Policy> FetchByIdAsync(Guid id)
         {
             //// Need to revisit partitionkey on Milestone2
-            return await _policyContainer.ReadItemAsync<Policy>(id.ToString(), new PartitionKey(id.ToString()));
+            try
+            {
+                return await _policyContainer.ReadItemAsync<Policy>(id.ToString(), new PartitionKey(id.ToString()));
+            }
+            catch(CosmosException exception)
+            {
+                _logger.LogDebug("No Item found", exception.Message);
+                _logger.LogInformation($"No item found for the given id: {id}");
+                return null;
+            }
         }
     }
 }
