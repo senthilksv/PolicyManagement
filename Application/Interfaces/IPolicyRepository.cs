@@ -14,12 +14,18 @@ namespace Application.Interfaces
         Task<Policy> DeleteByIdAsync(
             int id);
 
+        Task<Policy> FetchByParameterAsync(
+            string policyNumber, ProductType productType);
+
+        Task<Policy> FetchByPolicyNumberAsync(
+          string policyNumber);
+
         Task<Policy> FetchByIdAsync(
-            int id);
+         Guid id);
 
         Task<IEnumerable<Policy>> FetchListAsync();
 
         Task<Policy> UpdateByIdAsync(
-            int id);
+            Guid id, Policy policy);
     }
 }

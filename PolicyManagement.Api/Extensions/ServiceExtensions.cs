@@ -18,9 +18,19 @@ namespace PolicyManagement.Api.Extensions
                 {
                     Version = "V1",
                     Title = "PolicyManagement",
-                    Description = "This Api will be responsible for overall data distribution for teh policy management system."
+                    Description = "This Api will be responsible for overall data distribution for the policy management system."
                 });
             });         
+        }
+
+        public static void AddApiVersioningExtension(this IServiceCollection servcies)
+        {
+            servcies.AddApiVersioning(config =>
+            {
+                config.DefaultApiVersion = new Microsoft.AspNetCore.Mvc.ApiVersion(1, 0);
+                config.AssumeDefaultVersionWhenUnspecified = true;
+                config.ReportApiVersions = true;
+            });
         }
     }
 }

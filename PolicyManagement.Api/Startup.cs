@@ -13,6 +13,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Persistence;
 using PolicyManagement.Api.Extensions;
+using PolicyManagement.Api.Middleware;
+using System.Text.Json.Serialization;
+using Service;
 
 namespace PolicyManagement.Api
 {
@@ -28,9 +31,15 @@ namespace PolicyManagement.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers();
+            services.AddControllers().AddJsonOptions(options =>
+           {
+               options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+           });
+
             services.AddApplicationLayer();
             services.AddSWaggerExtension();
+            services.AddApiVersioningExtension();
+            services.AddService();
             services.AddPersistenceInfrastructure(Configuration);
         }
 
@@ -45,6 +54,8 @@ namespace PolicyManagement.Api
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseMiddleware<ErrorHandlerMiddleware>();
 
             app.UseAuthorization();
 

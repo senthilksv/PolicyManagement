@@ -1,0 +1,17 @@
+*.dll
+*.cache
+*.pdb
+bin/
+obj/
+Debug/
+bin\Debug\netstandard2.1
+bin/Debug/netstandard2.1
+Release/
+
+
+*/**/bin/Release
+*/**/obj/Debug
+*/**/obj/Release
+Debug/
+Release/
+Domain/obj/Debug/netstandard2.1

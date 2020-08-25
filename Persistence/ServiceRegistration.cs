@@ -14,10 +14,10 @@ namespace Persistence
             services.Configure<AzureCosmosDbOptions>(
                options =>
                {
-                   options.DatabaseId = configuration["Azure:CosmosDb:DatabaseId"]; // Could read from key vault if you wanted to  
+                   options.DatabaseId = configuration["Azure:CosmosDb:DatabaseId"]; 
                    options.Key = configuration["Azure:CosmosDb:Key"];
                    options.Endpoint = configuration["Azure:CosmosDb:Endpoint"];
-               });
+              });
 
             services.AddTransient<IPolicyRepository, PolicyRepository>();
         }

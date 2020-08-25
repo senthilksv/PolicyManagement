@@ -1,14 +1,15 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Application.Common
+namespace PolicyManagement.Application.Models
 {
-    public abstract class AuditableBaseEntity
+    public abstract class BaseViewModel
     {
         [JsonProperty(PropertyName = "id")]
-        public Guid Id { get; set; }
+        public string Id { get; set; }
 
         public string CreatedBy { get; set; }
         public DateTime Created { get; set; }

@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using AutoMapper;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,7 @@ namespace Application.Extensions
     {
         public static void AddApplicationLayer(this IServiceCollection services)
         {
-           
+            services.AddAutoMapper(Assembly.GetExecutingAssembly());
         }
     }
 }

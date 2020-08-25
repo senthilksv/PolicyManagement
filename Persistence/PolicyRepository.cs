@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Azure.Cosmos;
+using System.Linq;
 
 namespace Persistence
 {
@@ -19,7 +20,8 @@ namespace Persistence
 
         public async Task<Policy> AddAsync(Policy policy)
         {
-            return await _policyContainer.CreateItemAsync<Policy>(policy, new PartitionKey());
+            //// Need to revisit partitionkey on Milestone2
+            return await _policyContainer.CreateItemAsync<Policy>(policy, new PartitionKey(policy.Id.ToString()));
         }
 
         public async Task<Policy> DeleteByIdAsync(int id)
@@ -27,23 +29,25 @@ namespace Persistence
             return await this._policyContainer.DeleteItemAsync<Policy>(id.ToString(), new PartitionKey(id));
         }
 
-        public async Task<Policy> FetchByIdAsync(int id)
+        public async Task<Policy> FetchByParameterAsync(string policyNumber, ProductType productType)
         {
-            try
-            {
-                ItemResponse<Policy> response = await this._policyContainer.ReadItemAsync<Policy>(id.ToString(), new PartitionKey(id));
-                return response.Resource;
-            }
-            catch (CosmosException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
-            {
-                return null;
-            }
+            var query =
+             $"SELECT * FROM c where c.policyNumber = @policyNumber AND c.productType = @productType ";
+
+            var queryDefinition = new QueryDefinition(query).WithParameter("@policyNumber", policyNumber)
+                                                            .WithParameter("@productType", productType);
+
+            var queryIterator = _policyContainer.GetItemQueryIterator<Policy>(queryDefinition);
+
+            var response = await queryIterator.ReadNextAsync();
+
+            return response.Resource.SingleOrDefault();
         }
 
         public async Task<IEnumerable<Policy>> FetchListAsync()
         {
             var query =
-              $"SELECT * FROM p";
+              $"SELECT * FROM c";
 
             var queryDefinition = new QueryDefinition(query);
 
@@ -51,7 +55,7 @@ namespace Persistence
 
             var policyList = new List<Policy>();
 
-            while(queryIterator.HasMoreResults)
+            while (queryIterator.HasMoreResults)
             {
                 var response = await queryIterator.ReadNextAsync();
                 policyList.AddRange(response);
@@ -60,15 +64,35 @@ namespace Persistence
             return policyList;
         }
 
-        public async Task<Policy> UpdateByIdAsync(int id)
+        public async Task<Policy> UpdateByIdAsync(Guid id, Policy policy)
         {
-            var policy = await FetchByIdAsync(id);
             if (policy != null)
             {
-               return await this._policyContainer.UpsertItemAsync<Policy>(policy, new PartitionKey(id));
+                //// Need to revisit partitionkey on Milestone2
+                return await this._policyContainer.ReplaceItemAsync<Policy>(policy, id.ToString());
             }
 
             return null;
+        }
+
+        public async Task<Policy> FetchByPolicyNumberAsync(string policyNumber)
+        {
+            var query =
+             $"SELECT * FROM c where c.policyNumber = @policyNumber";
+
+            var queryDefinition = new QueryDefinition(query).WithParameter("@policyNumber", policyNumber);
+
+            var queryIterator = _policyContainer.GetItemQueryIterator<Policy>(queryDefinition);
+
+            var response = await queryIterator.ReadNextAsync();
+
+            return response.Resource.SingleOrDefault();
+        }
+
+        public async Task<Policy> FetchByIdAsync(Guid id)
+        {
+            //// Need to revisit partitionkey on Milestone2
+            return await _policyContainer.ReadItemAsync<Policy>(id.ToString(), new PartitionKey(id.ToString()));
         }
     }
 }

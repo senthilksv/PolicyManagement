@@ -1,37 +1,33 @@
-﻿using Application.Common;
+﻿using Domain.Entities;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
-using System.Text;
+using System.Linq;
+using System.Threading.Tasks;
 
-namespace Domain.Entities
+namespace PolicyManagement.Application.Models
 {
-    public class Policy : AuditableBaseEntity
+    public class PolicyViewModel
     {
-        public Policy()
-        {
-            Id = Guid.NewGuid();
-            PolicyNumber = DateTime.Now.Ticks.ToString();
-        }
-
-        [JsonProperty(PropertyName = "policyNumber")]
-        public string PolicyNumber { get; set; }
-
+        [Required]
         [JsonProperty(PropertyName = "monthlyPremium")]
         public decimal MonthlyPremium { get; set; }
-             
+
+        [Required]
         [JsonProperty(PropertyName = "sumAssured")]
         public decimal SumAssured { get; set; }
-                
+
+        [Required]
         [JsonProperty(PropertyName = "coverType")]
         public CoverType CoverType { get; set; }
-                
+
+        [Required]
         [JsonProperty(PropertyName = "productType")]
         public ProductType ProductType { get; set; }
 
         [JsonProperty(PropertyName = "customerDetails")]
-        public Customer CustomerDetails { get; set; }
+        public CustomerViewModel CustomerDetails { get; set; }
 
         [JsonProperty(PropertyName = "isSmoker")]
         public bool IsSmoker { get; set; }
