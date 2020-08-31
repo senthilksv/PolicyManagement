@@ -27,16 +27,16 @@ namespace PolicyManagement.Api.Controllers
             _policyService = policyService;
         }
 
-        [HttpGet(Name = "FetchPolicies")]
+        [HttpGet(Name = "GetAll")]
         [ProducesResponseType(200, Type = typeof(IEnumerable<GetPolicyViewModel>))]
-        public async Task<IActionResult> FetchListAsync()
+        public async Task<IActionResult> GetListAsync()
         {
             var result = await _policyService.FetchAllPolicyAsync();
 
             return Ok(result);
         }
 
-        [HttpGet("{policyNumber}/{productType}", Name = "FetchPolicy")]
+        [HttpGet("{policyNumber}/{productType}", Name = "Get")]
         [ProducesResponseType(200, Type = typeof(GetPolicyViewModel))]
         [ProducesResponseType(400, Type = typeof(string))]
         public async Task<IActionResult> Get([FromRoute] string policyNumber, [FromRoute] ProductType productType)
@@ -52,7 +52,7 @@ namespace PolicyManagement.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost(Name = "AddPolicy")]
+        [HttpPost(Name = "Add")]
         [ProducesResponseType(201, Type = typeof(GetPolicyViewModel))]
         [ProducesResponseType(400, Type = typeof(ModelStateDictionary))]
         public async Task<IActionResult> AddAsync(
@@ -69,9 +69,9 @@ namespace PolicyManagement.Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}", Name = "UpdatePolicy")]
+        [HttpPut("{id}", Name = "Update")]
         [ProducesResponseType(201, Type = typeof(GetPolicyViewModel))]
-        [ProducesResponseType(400, Type = typeof(ModelStateDictionary))]       
+        [ProducesResponseType(400, Type = typeof(ModelStateDictionary))]
         public async Task<IActionResult> UpdateAsync([FromRoute] Guid id,
            [FromBody] PolicyViewModel policyViewModel)
         {
@@ -90,7 +90,7 @@ namespace PolicyManagement.Api.Controllers
 
             var result = await _policyService.UpdatePolicyAsync(id, policyViewModel);
 
-            if(result == null)
+            if (result == null)
             {
                 _logger.LogInformation($"No Policy Found for the given Id :{id}");
                 return BadRequest("Policy not found for an update");
@@ -99,23 +99,28 @@ namespace PolicyManagement.Api.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id}", Name = "DeletePolicy")]
-        [ProducesResponseType(204)]
-        [ProducesResponseType(400)]      
+        [HttpDelete("{id}", Name = "Delete")]
+        [ProducesResponseType(200)]
+        [ProducesResponseType(400)]
         public async Task<IActionResult> DeleteByIdAsync(
            [FromRoute] Guid id)
         {
             if (id == null
                 || id == Guid.Empty)
             {
-                _logger.LogInformation("Id required");               
+                _logger.LogInformation("Id required");
                 return BadRequest("Id required.");
             }
 
-            await _policyService.DeletePolicyAsync(
-                id);
+            var result = await _policyService.DeletePolicyAsync(
+                 id);
 
-            return NoContent();
+            if (result)
+            {
+                return Ok("Item has been deleted");
+            }
+
+            return BadRequest("Unable to delete.");
         }
     }
 }

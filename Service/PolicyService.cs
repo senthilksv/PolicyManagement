@@ -35,13 +35,13 @@ namespace Service
             return _mapper.Map<GetPolicyViewModel>(addedPolicy);
         }
 
-        public async Task<GetPolicyViewModel> DeletePolicyAsync(Guid id)
+        public async Task<bool> DeletePolicyAsync(Guid id)
         {
-            var policy = await _policyRepository.DeleteByIdAsync(id);
+            var result = await _policyRepository.DeleteByIdAsync(id);
 
             _logger.LogInformation($"Policy has been deleted - id: {id}");
 
-            return _mapper.Map<GetPolicyViewModel>(policy);
+            return result;
         }
 
         public async Task<GetPolicyViewModel> FetchPolicyAsync(string policyNumber, ProductType productType)

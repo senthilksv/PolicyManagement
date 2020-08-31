@@ -13,7 +13,7 @@ namespace Application.Interfaces
         Task<GetPolicyViewModel> AddPolicyAsync(
            PolicyViewModel policyViewModel);
 
-        Task<GetPolicyViewModel> DeletePolicyAsync(
+        Task<bool> DeletePolicyAsync(
             Guid id);
 
         Task<GetPolicyViewModel> FetchPolicyAsync(

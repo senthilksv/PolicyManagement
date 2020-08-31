@@ -11,26 +11,24 @@ using Microsoft.Extensions.Logging;
 
 namespace Persistence
 {
-    public class PolicyRepository : CosmosDbRepository, IPolicyRepository
-    {
-        private readonly Container _policyContainer;
+    public class PolicyRepository : CosmosDbRepository<Policy>, IPolicyRepository
+    {       
         private readonly ILogger<PolicyRepository> _logger;
 
-        public PolicyRepository(IOptions<AzureCosmosDbOptions> azureCosmosDbOptions, ILogger<PolicyRepository> logger) : base(azureCosmosDbOptions)
-        {
-            _policyContainer = _cosmosDatabase.GetContainer("Policy");
+        public PolicyRepository(IOptions<AzureCosmosDbOptions> azureCosmosDbOptions, ILogger<PolicyRepository> logger) : base(azureCosmosDbOptions, "Policy")
+        {           
             _logger = logger;
         }
 
         public async Task<Policy> AddAsync(Policy policy)
         {
             //// Need to revisit partitionkey on Milestone2
-            return await _policyContainer.CreateItemAsync<Policy>(policy, new PartitionKey(policy.Id.ToString()));
+            return await CreateItemAsync(policy, policy.Id.ToString());
         }
 
-        public async Task<Policy> DeleteByIdAsync(Guid id)
+        public async Task<bool> DeleteByIdAsync(Guid id)
         {
-            return await this._policyContainer.DeleteItemAsync<Policy>(id.ToString(), new PartitionKey(id.ToString()));
+            return await DeleteItemAsync(id.ToString(), id.ToString());
         }
 
         public async Task<Policy> FetchByParameterAsync(string policyNumber, ProductType productType)
@@ -41,11 +39,9 @@ namespace Persistence
             var queryDefinition = new QueryDefinition(query).WithParameter("@policyNumber", policyNumber)
                                                             .WithParameter("@productType", productType);
 
-            var queryIterator = _policyContainer.GetItemQueryIterator<Policy>(queryDefinition);
+            var response = await FetchItemsAsync(queryDefinition);           
 
-            var response = await queryIterator.ReadNextAsync();
-
-            return response.Resource.SingleOrDefault();
+            return response.SingleOrDefault();
         }
 
         public async Task<IEnumerable<Policy>> FetchListAsync()
@@ -55,17 +51,9 @@ namespace Persistence
 
             var queryDefinition = new QueryDefinition(query);
 
-            var queryIterator = _policyContainer.GetItemQueryIterator<Policy>(queryDefinition);
+            var response = await FetchItemsAsync(queryDefinition);
 
-            var policyList = new List<Policy>();
-
-            while (queryIterator.HasMoreResults)
-            {
-                var response = await queryIterator.ReadNextAsync();
-                policyList.AddRange(response);
-            }
-
-            return policyList;
+            return response;
         }
 
         public async Task<Policy> UpdateByIdAsync(Guid id, Policy policy)
@@ -73,7 +61,7 @@ namespace Persistence
             if (policy != null)
             {
                 //// Need to revisit partitionkey on Milestone2
-                return await this._policyContainer.ReplaceItemAsync<Policy>(policy, id.ToString());
+                return await UpdateItemAsync(policy);
             }
 
             return null;
@@ -86,26 +74,15 @@ namespace Persistence
 
             var queryDefinition = new QueryDefinition(query).WithParameter("@policyNumber", policyNumber);
 
-            var queryIterator = _policyContainer.GetItemQueryIterator<Policy>(queryDefinition);
+            var response = await FetchItemsAsync(queryDefinition);
 
-            var response = await queryIterator.ReadNextAsync();
-
-            return response.Resource.SingleOrDefault();
+            return response.SingleOrDefault();          
         }
 
         public async Task<Policy> FetchByIdAsync(Guid id)
         {
             //// Need to revisit partitionkey on Milestone2
-            try
-            {
-                return await _policyContainer.ReadItemAsync<Policy>(id.ToString(), new PartitionKey(id.ToString()));
-            }
-            catch(CosmosException exception)
-            {
-                _logger.LogDebug("No Item found", exception.Message);
-                _logger.LogInformation($"No item found for the given id: {id}");
-                return null;
-            }
+            return await FetchItemAsync(id.ToString(), id.ToString());
         }
     }
 }

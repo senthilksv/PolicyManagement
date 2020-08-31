@@ -11,7 +11,7 @@ namespace Application.Interfaces
         Task<Policy> AddAsync(
             Policy policy);
 
-        Task<Policy> DeleteByIdAsync(
+        Task<bool> DeleteByIdAsync(
             Guid id);
 
         Task<Policy> FetchByParameterAsync(
